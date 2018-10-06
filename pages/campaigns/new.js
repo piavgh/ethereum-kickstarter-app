@@ -8,7 +8,8 @@ import factory from '../../ethereum/factory';
 class CampaignNew extends Component {
     state = {
         minimumContribution: '',
-        errorMessage: ''
+        errorMessage: '',
+        loading: false
     };
 
     handleInputChange = event => {
@@ -19,6 +20,11 @@ class CampaignNew extends Component {
 
     handleSubmit = async event => {
         event.preventDefault();
+
+        this.setState({
+            loading: true,
+            errorMessage: ''
+        });
 
         try {
             const accounts = await web3.eth.getAccounts();
@@ -33,6 +39,10 @@ class CampaignNew extends Component {
                 errorMessage: err.message
             });
         }
+
+        this.setState({
+            loading: false
+        });
     };
 
     render() {
@@ -60,7 +70,13 @@ class CampaignNew extends Component {
                         content={this.state.errorMessage}
                     />
 
-                    <Button primary>Create</Button>
+                    <Button
+                        loading={this.state.loading}
+                        disabled={this.state.loading}
+                        primary
+                    >
+                        Create
+                    </Button>
                 </Form>
             </Layout>
         );
