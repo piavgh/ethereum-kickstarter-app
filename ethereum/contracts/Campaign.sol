@@ -31,17 +31,17 @@ contract Campaign {
     uint public approversCount;
     
     modifier restricted() {
-        require(msg.sender == manager);
+        require(msg.sender == manager, "This action requires a manager");
         _;
     }
     
-    function Campaign(uint minimum, address creator) public {
+    constructor(uint minimum, address creator) public {
         manager = creator;
         minimumContribution = minimum;
     }
     
     function contribute() public payable {
-        require(msg.value > minimumContribution);
+        require(msg.value > minimumContribution, "We have a minimum amount of contribution");
         
         // Keep track of number of contributors
         if(!approvers[msg.sender]) {
@@ -58,7 +58,7 @@ contract Campaign {
         address recipient
     ) public restricted {
         // Ensure we can't ask for more money than the contract holds
-        require(value <= address(this).balance);
+        require(value <= address(this).balance, "You can't ask to withdraw more than the balance of the campaign");
 
         Request memory newRequest = Request({
             description: description,
@@ -74,8 +74,8 @@ contract Campaign {
     function approveRequest(uint index) public {
         Request storage request = requests[index];
         
-        require(approvers[msg.sender]);
-        require(!request.approvals[msg.sender]);
+        require(approvers[msg.sender], "You must be a contributor in order to approve");
+        require(!request.approvals[msg.sender], "You can't approve twice");
         
         request.approvals[msg.sender] = true;
         request.approvalCount++;
@@ -84,8 +84,8 @@ contract Campaign {
     function finalizeRequest(uint index) public restricted {
         Request storage request = requests[index];
         
-        require(request.approvalCount > (approversCount / 2));
-        require(!request.complete);
+        require(request.approvalCount > (approversCount / 2), "We need to have more than 50% of contributors approve");
+        require(!request.complete, "You can't finilize an already finalized request");
         
         request.recipient.transfer(request.value);
         request.complete = true;
@@ -94,7 +94,7 @@ contract Campaign {
     function getSummary() public view returns (uint, uint, uint, uint, address) {
         return (
             minimumContribution,
-            this.balance,
+            address(this).balance,
             requests.length,
             approversCount,
             manager
