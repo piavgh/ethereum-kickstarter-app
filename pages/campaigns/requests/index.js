@@ -32,7 +32,7 @@ class RequestIndex extends Component {
             return (
                 <RequestRow
                     request={request}
-                    id={index + 1}
+                    id={index}
                     key={index}
                     address={this.props.address}
                     approversCount={this.props.approversCount}
@@ -49,7 +49,13 @@ class RequestIndex extends Component {
                 <h3>Request List</h3>
                 <Link route={`/campaigns/${this.props.address}/requests/new`}>
                     <a>
-                        <Button primary>Add Request</Button>
+                        <Button
+                            primary
+                            floated="right"
+                            style={{ marginBottom: '10px' }}
+                        >
+                            Add Request
+                        </Button>
                     </a>
                 </Link>
                 <Table>
@@ -66,6 +72,7 @@ class RequestIndex extends Component {
                     </Header>
                     <Body>{this.renderRows()}</Body>
                 </Table>
+                <div>Found {this.props.requestsCount} requests</div>
             </Layout>
         );
     }
